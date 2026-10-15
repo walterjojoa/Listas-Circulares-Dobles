@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UNO Circular · Lista Circular Doble</title>
+  <title>UNO Circular · Circular Doubly Linked List</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -12,163 +12,163 @@
 <div class="app">
   <header>
     <div class="logo">
-      <div class="logo-cartas"><span></span><span></span><span></span><span></span></div>
+      <div class="logo-cards"><span></span><span></span><span></span><span></span></div>
       <div>
         <h1>UNO Circular</h1>
-        <p>Turnos de juego con una <b>Lista Circular Doble</b> en Python</p>
+        <p>Game turns with a <b>Circular Doubly Linked List</b> in Python</p>
       </div>
     </div>
     <nav>
-      <button class="btn btn-cian" id="btn-recorrer" title="Recorre la lista desde el jugador en turno">🔁 Recorrer lista</button>
-      <button class="btn btn-morado" id="btn-auto" title="Los turnos se juegan solos">🤖 Modo auto</button>
-      <button class="btn btn-amarillo" id="btn-nuevo">✨ Nueva partida</button>
+      <button class="btn btn-cyan" id="btn-traverse" title="Walks the list starting at the current player">🔁 Traverse list</button>
+      <button class="btn btn-purple" id="btn-auto" title="Turns play themselves">🤖 Auto mode</button>
+      <button class="btn btn-yellow" id="btn-new">✨ New game</button>
     </nav>
   </header>
 
   <main>
-    <section class="zona-juego">
-      <div id="mesa">
-        <svg id="enlaces" viewBox="0 0 1000 1000" aria-hidden="true">
+    <section class="play-area">
+      <div id="table">
+        <svg id="links" viewBox="0 0 1000 1000" aria-hidden="true">
           <defs>
-            <marker id="flecha-sig" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" orient="auto">
+            <marker id="arrow-next" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" orient="auto">
               <path d="M0,0 L10,5 L0,10 z" fill="#ff5fd2"/>
             </marker>
-            <marker id="flecha-ant" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" orient="auto">
+            <marker id="arrow-prev" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" orient="auto">
               <path d="M0,0 L10,5 L0,10 z" fill="#2ee6ff"/>
             </marker>
-            <marker id="flecha-sig-on" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="34" markerHeight="34" orient="auto">
+            <marker id="arrow-next-on" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="34" markerHeight="34" orient="auto">
               <path d="M0,0 L10,5 L0,10 z" fill="#ffe14d"/>
             </marker>
-            <marker id="flecha-ant-on" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="34" markerHeight="34" orient="auto">
+            <marker id="arrow-prev-on" viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="34" markerHeight="34" orient="auto">
               <path d="M0,0 L10,5 L0,10 z" fill="#ffe14d"/>
             </marker>
           </defs>
-          <g id="g-enlaces"></g>
+          <g id="g-links"></g>
         </svg>
 
-        <div id="centro">
-          <svg id="anillo" viewBox="0 0 200 200" aria-hidden="true">
-            <circle cx="100" cy="100" r="92" class="anillo-pista"/>
-            <g id="anillo-flechas">
-              <path d="M100 8 A92 92 0 0 1 192 100" class="anillo-arco"/>
-              <path d="M100 192 A92 92 0 0 1 8 100" class="anillo-arco"/>
-              <path d="M186 84 L192 104 L200 84 z" class="anillo-punta"/>
-              <path d="M14 116 L8 96 L0 116 z" class="anillo-punta"/>
+        <div id="center">
+          <svg id="ring" viewBox="0 0 200 200" aria-hidden="true">
+            <circle cx="100" cy="100" r="92" class="ring-track"/>
+            <g id="ring-arrows">
+              <path d="M100 8 A92 92 0 0 1 192 100" class="ring-arc"/>
+              <path d="M100 192 A92 92 0 0 1 8 100" class="ring-arc"/>
+              <path d="M186 84 L192 104 L200 84 z" class="ring-tip"/>
+              <path d="M14 116 L8 96 L0 116 z" class="ring-tip"/>
             </g>
           </svg>
-          <div class="pilas">
-            <button id="mazo" class="carta dorso" title="Robar carta">
-              <span class="ovalo"><i>UNO</i></span>
-              <em id="mazo-n">0</em>
+          <div class="piles">
+            <button id="deck" class="card back" title="Draw a card">
+              <span class="oval"><i>UNO</i></span>
+              <em id="deck-count">0</em>
             </button>
-            <div id="descarte"></div>
+            <div id="discard"></div>
           </div>
-          <div id="sentido-lbl"></div>
+          <div id="direction-label"></div>
         </div>
 
-        <div id="nodos"></div>
+        <div id="nodes"></div>
       </div>
 
-      <div class="leyenda">
-        <span><i class="ley ley-sig"></i> puntero <b>siguiente</b></span>
-        <span><i class="ley ley-ant"></i> puntero <b>anterior</b></span>
-        <span><i class="ley ley-on"></i> próximo turno</span>
+      <div class="legend">
+        <span><i class="key key-next"></i> <b>next</b> pointer</span>
+        <span><i class="key key-prev"></i> <b>prev</b> pointer</span>
+        <span><i class="key key-on"></i> upcoming turn</span>
       </div>
 
-      <div class="panel turno">
-        <div class="turno-cabecera">
-          <div class="turno-quien">
-            <div class="turno-avatar" id="turno-avatar"></div>
+      <div class="panel turn">
+        <div class="turn-header">
+          <div class="turn-who">
+            <div class="turn-avatar" id="turn-avatar"></div>
             <div>
-              <small>Turno de</small>
-              <h2 id="turno-nombre">—</h2>
+              <small>Turn of</small>
+              <h2 id="turn-name">—</h2>
             </div>
           </div>
-          <div class="turno-info" id="turno-info"></div>
-          <div class="turno-botones">
-            <button class="btn btn-amarillo" id="btn-robar">🃏 Robar</button>
-            <button class="btn btn-rosa" id="btn-pasar">⏭ Pasar</button>
-            <button class="btn btn-cian" id="btn-jugada-auto">⚡ Jugada auto</button>
+          <div class="turn-info" id="turn-info"></div>
+          <div class="turn-buttons">
+            <button class="btn btn-yellow" id="btn-draw">🃏 Draw</button>
+            <button class="btn btn-pink" id="btn-pass">⏭ Pass</button>
+            <button class="btn btn-cyan" id="btn-auto-move">⚡ Auto move</button>
           </div>
         </div>
-        <div class="mano" id="mano"></div>
+        <div class="hand" id="hand"></div>
       </div>
     </section>
 
     <aside>
       <div class="panel">
-        <h3>🔗 Estructura en memoria</h3>
-        <div class="cadena" id="cadena"></div>
-        <div class="tabla-wrap">
-          <table class="tabla">
-            <thead><tr><th>#</th><th>Nodo</th><th>⬅ anterior</th><th>siguiente ➡</th></tr></thead>
-            <tbody id="tabla-nodos"></tbody>
+        <h3>🔗 Structure in memory</h3>
+        <div class="chain" id="chain"></div>
+        <div class="table-wrap">
+          <table class="ptr-table">
+            <thead><tr><th>#</th><th>Node</th><th>⬅ prev</th><th>next ➡</th></tr></thead>
+            <tbody id="node-rows"></tbody>
           </table>
         </div>
       </div>
 
       <div class="panel">
-        <h3>👥 Operaciones sobre la lista</h3>
-        <form class="fila-form" id="form-agregar">
-          <input id="in-agregar" maxlength="14" placeholder="Nombre del nuevo jugador" autocomplete="off">
-          <button class="btn btn-verde" type="submit">➕ Insertar</button>
+        <h3>👥 List operations</h3>
+        <form class="form-row" id="form-add">
+          <input id="in-add" maxlength="14" placeholder="New player's name" autocomplete="off">
+          <button class="btn btn-green" type="submit">➕ Insert</button>
         </form>
-        <form class="fila-form" id="form-buscar">
-          <input id="in-buscar" maxlength="14" placeholder="Buscar jugador por nombre" autocomplete="off">
-          <button class="btn btn-azul" type="submit">🔍 Buscar</button>
+        <form class="form-row" id="form-search">
+          <input id="in-search" maxlength="14" placeholder="Search player by name" autocomplete="off">
+          <button class="btn btn-blue" type="submit">🔍 Search</button>
         </form>
-        <ul class="lista-jugadores" id="lista-jugadores"></ul>
+        <ul class="player-list" id="player-list"></ul>
       </div>
 
       <div class="panel">
-        <h3>📜 Bitácora</h3>
-        <ul class="bitacora" id="bitacora"></ul>
+        <h3>📜 Log</h3>
+        <ul class="log" id="log"></ul>
       </div>
     </aside>
   </main>
 </div>
 
-<!-- Configuración de partida -->
+<!-- Game setup -->
 <div class="modal" id="modal-setup" hidden>
   <div class="modal-card">
-    <h2>🎲 Nueva partida</h2>
-    <p>Cada jugador será un <b>nodo</b> de la lista circular doble. Entre 2 y 10 jugadores.</p>
-    <div id="setup-nombres" class="setup-nombres"></div>
-    <div class="modal-acciones">
-      <button class="btn btn-cian" id="setup-mas">➕ Jugador</button>
-      <button class="btn btn-amarillo" id="setup-ok">¡Comenzar!</button>
+    <h2>🎲 New game</h2>
+    <p>Each player will be a <b>node</b> of the circular doubly linked list. Between 2 and 10 players.</p>
+    <div id="setup-names" class="setup-names"></div>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" id="setup-add">➕ Player</button>
+      <button class="btn btn-yellow" id="setup-ok">Start!</button>
     </div>
   </div>
 </div>
 
-<!-- Selector de color para comodines -->
+<!-- Color picker for wild cards -->
 <div class="modal" id="modal-color" hidden>
   <div class="modal-card">
-    <h2>🌈 Elige un color</h2>
-    <div class="colores">
-      <button data-color="rojo" class="col c-rojo">Rojo</button>
-      <button data-color="amarillo" class="col c-amarillo">Amarillo</button>
-      <button data-color="verde" class="col c-verde">Verde</button>
-      <button data-color="azul" class="col c-azul">Azul</button>
+    <h2>🌈 Choose a color</h2>
+    <div class="colors">
+      <button data-color="red" class="swatch c-red">Red</button>
+      <button data-color="yellow" class="swatch c-yellow">Yellow</button>
+      <button data-color="green" class="swatch c-green">Green</button>
+      <button data-color="blue" class="swatch c-blue">Blue</button>
     </div>
-    <div class="modal-acciones"><button class="btn btn-rosa" id="color-cancelar">Cancelar</button></div>
+    <div class="modal-actions"><button class="btn btn-pink" id="color-cancel">Cancel</button></div>
   </div>
 </div>
 
-<!-- Fin de partida -->
-<div class="modal" id="modal-fin" hidden>
+<!-- Game over -->
+<div class="modal" id="modal-end" hidden>
   <div class="modal-card">
-    <h2>🏆 ¡Fin de la partida!</h2>
-    <ol class="podio" id="podio"></ol>
-    <div class="modal-acciones">
-      <button class="btn btn-cian" id="fin-cerrar">Ver mesa</button>
-      <button class="btn btn-amarillo" id="fin-nuevo">Jugar de nuevo</button>
+    <h2>🏆 Game over!</h2>
+    <ol class="podium" id="podium"></ol>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" id="end-close">View table</button>
+      <button class="btn btn-yellow" id="end-new">Play again</button>
     </div>
   </div>
 </div>
 
 <div class="toasts" id="toasts"></div>
-<canvas id="confeti"></canvas>
+<canvas id="confetti"></canvas>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>

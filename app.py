@@ -1,107 +1,107 @@
 """
-Servidor Flask: expone el juego como una API JSON y sirve el frontend.
+Flask server: exposes the game as a JSON API and serves the frontend.
 
-Ejecutar:
+Run:
     pip install -r requirements.txt
     python app.py
-y abrir http://127.0.0.1:5000
+then open http://127.0.0.1:5000
 """
 
 from flask import Flask, jsonify, render_template, request
 
-from juego import Juego, JuegoError
+from game import Game, GameError
 
 app = Flask(__name__)
-juego = None  # una sola partida en memoria
+game = None  # a single game kept in memory
 
 
-def respuesta():
-    return jsonify(juego.estado())
+def response():
+    return jsonify(game.state())
 
 
-def requiere_juego():
-    if juego is None:
-        raise JuegoError("Primero inicia una partida.")
+def require_game():
+    if game is None:
+        raise GameError("Start a game first.")
 
 
-@app.errorhandler(JuegoError)
-def manejar_error(error):
+@app.errorhandler(GameError)
+def handle_error(error):
     return jsonify({"error": str(error)}), 400
 
 
 @app.get("/")
-def inicio():
+def index():
     return render_template("index.html")
 
 
-@app.get("/api/estado")
-def estado():
-    if juego is None:
-        return jsonify({"iniciado": False})
-    juego.eventos = []
-    return respuesta()
+@app.get("/api/state")
+def state():
+    if game is None:
+        return jsonify({"started": False})
+    game.events = []
+    return response()
 
 
-@app.post("/api/nuevo")
-def nuevo():
-    global juego
-    datos = request.get_json(silent=True) or {}
-    juego = Juego(datos.get("jugadores", []))
-    return respuesta()
+@app.post("/api/new")
+def new_game():
+    global game
+    data = request.get_json(silent=True) or {}
+    game = Game(data.get("players", []))
+    return response()
 
 
-@app.post("/api/jugar")
-def jugar():
-    requiere_juego()
-    datos = request.get_json(silent=True) or {}
+@app.post("/api/play")
+def play():
+    require_game()
+    data = request.get_json(silent=True) or {}
     try:
-        indice = int(datos.get("indice"))
+        index = int(data.get("index"))
     except (TypeError, ValueError):
-        raise JuegoError("Índice de carta inválido.")
-    juego.jugar(indice, datos.get("color"))
-    return respuesta()
+        raise GameError("Invalid card index.")
+    game.play(index, data.get("color"))
+    return response()
 
 
-@app.post("/api/robar")
-def robar():
-    requiere_juego()
-    juego.robar()
-    return respuesta()
+@app.post("/api/draw")
+def draw():
+    require_game()
+    game.draw()
+    return response()
 
 
-@app.post("/api/pasar")
-def pasar():
-    requiere_juego()
-    juego.pasar()
-    return respuesta()
+@app.post("/api/pass")
+def pass_turn():
+    require_game()
+    game.pass_turn()
+    return response()
 
 
 @app.post("/api/auto")
 def auto():
-    requiere_juego()
-    juego.turno_automatico()
-    return respuesta()
+    require_game()
+    game.auto_turn()
+    return response()
 
 
-@app.post("/api/jugadores")
-def agregar_jugador():
-    requiere_juego()
-    datos = request.get_json(silent=True) or {}
-    juego.agregar_jugador(datos.get("nombre", ""))
-    return respuesta()
+@app.post("/api/players")
+def add_player():
+    require_game()
+    data = request.get_json(silent=True) or {}
+    game.add_player(data.get("name", ""))
+    return response()
 
 
-@app.delete("/api/jugadores/<int:id_>")
-def eliminar_jugador(id_):
-    requiere_juego()
-    juego.eliminar_jugador(id_)
-    return respuesta()
+@app.delete("/api/players/<int:id_>")
+def remove_player(id_):
+    require_game()
+    game.remove_player(id_)
+    return response()
 
 
-@app.get("/api/buscar")
-def buscar():
-    requiere_juego()
-    return jsonify(juego.buscar_jugador(request.args.get("nombre", "")))
+@app.get("/api/search")
+def search():
+    require_game()
+    return jsonify(game.search_player(request.args.get("name", "")))
 
 
 if __name__ == "__main__":
